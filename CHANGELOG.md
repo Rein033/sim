@@ -4,6 +4,18 @@ What changes from one kode-sim release to the next. The versions follow
 [SemVer](https://semver.org): until 1.0 a minor release (0.2, 0.3…) may
 change how kode-sim is used, and says so here.
 
+## [Unreleased]
+
+### Fixed
+
+- **A kode-sdk that moved on no longer leaves an old configuration behind.**
+  kode-sdk 0.1.5 keeps the board's Kconfig in kbsp's `sdkconfig.board`. A
+  sdkconfig made before a project's kode-sdk changed was kept, with the old
+  values, and kodeOS 0.1.5 stopped at a static assertion in `kdrv_ble.c`
+  ("every bond's subscriptions must fit NimBLE's store"). The configuration
+  is made again when that file changes, in the kode-sdk the build was
+  pointed at or the project's own, or when the project pins another kode-sdk.
+
 ## [0.3.0] - 2026-11-16
 
 kode-sim moves to esp-emu 1.1.0, which models the Kode Dot's screen, its
