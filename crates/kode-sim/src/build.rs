@@ -105,8 +105,13 @@ fn write_if_changed(p: &Path, text: &[u8]) -> Result<(), BuildError> {
 
 /// What a configuration is made from, hashed: the project's
 /// sdkconfig.defaults* (as the copy `src` has them), the emu overlay unless
-/// for the board, the kode-sdk it was pointed at. When it changes, the
-/// sdkconfig made from it before goes.
+/// for the board, the kode-sdk it was pointed at, and the board's own
+/// settings, kbsp's sdkconfig.board (kode-sdk 0.1.5 on), wherever this
+/// project takes its kode-sdk from - the one it was pointed at, its own
+/// (`sdk/`, kodeOS's submodule), or the one its idf_component.yml pins for
+/// the component manager to fetch. When it changes, the sdkconfig made from
+/// it before goes: ESP-IDF keeps a value a sdkconfig already has, whatever
+/// the defaults now say.
 pub fn config_stamp(src: &Path, sdk: Option<&Path>, board: bool) -> String {
     use sha1::{Digest, Sha1};
     let mut h = Sha1::new();
@@ -120,8 +125,12 @@ pub fn config_stamp(src: &Path, sdk: Option<&Path>, board: bool) -> String {
         .collect();
     defaults.sort();
     let overlay = (!board).then(|| kode_sim_cmake().with_file_name("sdkconfig.emu"));
-    for f in defaults.iter().chain(overlay.iter()) {
-        let body = std::fs::read(f).unwrap_or_default();
+    let kbsp = "components/kbsp/sdkconfig.board";
+    let board_settings =
+        [sdk.map(|s| s.join(kbsp)), Some(src.join("sdk").join(kbsp)), Some(src.join("main").join("idf_component.yml"))];
+    let board_settings = board_settings.into_iter().flatten().filter(|p| p.is_file());
+    for f in defaults.iter().cloned().chain(overlay).chain(board_settings) {
+        let body = std::fs::read(&f).unwrap_or_default();
         h.update(format!("{}\n{}\n", f.file_name().unwrap_or_default().to_string_lossy(), body.len()));
         h.update(&body);
     }
@@ -958,6 +967,40 @@ endif()
         assert_ne!(emu, config_stamp(&t.0, None, true));
         assert_ne!(emu, config_stamp(&t.0, Some(Path::new("/sdk")), false));
         assert_eq!(emu, config_stamp(&t.0, None, false));
+    }
+
+    #[test]
+    fn the_stamp_changes_with_the_board_s_settings_wherever_the_kode_sdk_keeps_them() {
+        // kode-sdk 0.1.5 keeps the board's Kconfig in kbsp's sdkconfig.board,
+        // which a project's CMakeLists puts before its own defaults. A
+        // sdkconfig made before it changed must not be kept.
+        let t = Tmp::new("stamp-board");
+        fs::write(t.0.join("sdkconfig.defaults"), "CONFIG_A=y\n").unwrap();
+        let before = config_stamp(&t.0, None, false);
+
+        // In the project's own kode-sdk (kodeOS's submodule).
+        let own = t.0.join("sdk/components/kbsp");
+        fs::create_dir_all(&own).unwrap();
+        fs::write(own.join("sdkconfig.board"), "CONFIG_BT_NIMBLE_MAX_CCCDS=21\n").unwrap();
+        let with_own = config_stamp(&t.0, None, false);
+        assert_ne!(before, with_own);
+        fs::write(own.join("sdkconfig.board"), "CONFIG_BT_NIMBLE_MAX_CCCDS=30\n").unwrap();
+        assert_ne!(with_own, config_stamp(&t.0, None, false), "the submodule moved on");
+
+        // In the kode-sdk the build was pointed at (--sdk).
+        let sdk = t.0.join("elsewhere");
+        fs::create_dir_all(sdk.join("components/kbsp")).unwrap();
+        fs::write(sdk.join("components/kbsp/sdkconfig.board"), "CONFIG_B=1\n").unwrap();
+        let pointed = config_stamp(&t.0, Some(&sdk), false);
+        fs::write(sdk.join("components/kbsp/sdkconfig.board"), "CONFIG_B=2\n").unwrap();
+        assert_ne!(pointed, config_stamp(&t.0, Some(&sdk), false), "the --sdk checkout was pulled");
+
+        // Fetched by the component manager: the pin says which one.
+        fs::create_dir_all(t.0.join("main")).unwrap();
+        fs::write(t.0.join("main/idf_component.yml"), "version: v0.1.4\n").unwrap();
+        let pinned = config_stamp(&t.0, None, false);
+        fs::write(t.0.join("main/idf_component.yml"), "version: v0.1.5\n").unwrap();
+        assert_ne!(pinned, config_stamp(&t.0, None, false), "the project pins another kode-sdk");
     }
 
     #[test]
