@@ -124,6 +124,8 @@ works), click the buttons or use the keys - <kbd>T</kbd> top,
 <kbd>B</kbd> bottom, the arrows for the D-pad. **Settings** slides out the
 rest: power and reset, the battery and the USB cable, the microSD, motion,
 the computer on the USB cable, installing an app and the console.
+"Speed" at its top is the emulated clock against your computer's: 1.00× is
+a board's own pace, less is an emulator that cannot keep up.
 "Computer's microphone" sends your computer's microphone to the Kode Dot's; it is on
 unless you turn it off, and the page remembers that. Off, the Kode Dot hears
 only its own speaker through the case and its ADC's floor, as on a quiet

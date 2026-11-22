@@ -6,6 +6,13 @@ change how kode-sim is used, and says so here.
 
 ## [Unreleased]
 
+### Added
+
+- **Settings says how fast the Kode Dot runs.** "Speed: 0.92× real time" is
+  the emulated clock against your computer's, read every two seconds: 1.00
+  is a board's own pace, less is an emulator that cannot keep up. The same
+  reading is in `api/stats`, as `sim_ms`.
+
 ### Changed
 
 - **The window is in English.** Every label, tooltip, state and message of

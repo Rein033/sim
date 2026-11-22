@@ -113,13 +113,20 @@ async fn page(bridge: Arc<Bridge>, socket: WebSocket) {
 }
 
 /// How the simulator is doing: `uart_bytes`, what has crossed UART1 from
-/// the firmware (screen frames packed, as they travel), and
-/// `serial_dropped`, the console lines its serial port had no room for.
+/// the firmware (screen frames packed, as they travel), `serial_dropped`,
+/// the console lines its serial port had no room for, and `sim_ms`, the
+/// emulated time since the chip's last reset (0 while it is off): two
+/// readings against the wall clock say how fast the Kode Dot runs.
 async fn stats(State(bridge): State<Arc<Bridge>>, headers: HeaderMap) -> Response {
     if !bridge.origin_ok(origin(&headers)) {
         return forbidden();
     }
-    Json(json!({"uart_bytes": bridge.uart_bytes(), "serial_dropped": bridge.serial_dropped()})).into_response()
+    Json(json!({
+        "uart_bytes": bridge.uart_bytes(),
+        "serial_dropped": bridge.serial_dropped(),
+        "sim_ms": bridge.sim_time_ns().unwrap_or(0) / 1_000_000,
+    }))
+    .into_response()
 }
 
 fn refuse(code: StatusCode, error: &str) -> Response {

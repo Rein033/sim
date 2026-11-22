@@ -1093,3 +1093,24 @@ async def test_run_in_the_background_of_a_terminal_keeps_running(exe, fake_emu, 
                                 env=env(tmp_path / "cache"), capture_output=True, text=True, timeout=30)
     stat = r.stdout.strip()
     assert stat and "T" not in stat, f"kode-sim run was stopped in the background (ps: {stat!r}) {r.stderr}"
+
+
+async def test_the_page_s_stats_say_how_far_the_emulated_clock_has_got(sim):
+    """api/stats: sim_ms, the emulated time since the chip's last reset. Two
+    readings against the wall clock say how fast the Kode Dot runs."""
+    a = await ws(sim)
+    await a.send_str(json.dumps({"console_in": "rxformat 48000 1 16"}))     # the fake's heartbeat starts
+    async with aiohttp.ClientSession() as s:
+        async def sim_ms():
+            return (await (await s.get(f"{sim.url}api/stats")).json())["sim_ms"]
+        loop = asyncio.get_running_loop()
+        end = loop.time() + 5
+        while loop.time() < end and not await sim_ms():
+            await asyncio.sleep(0.1)
+        first, t0 = await sim_ms(), loop.time()
+        assert first > 0
+        await asyncio.sleep(1.0)
+        second, t1 = await sim_ms(), loop.time()
+        pace = (second - first) / 1000 / (t1 - t0)       # the fake's clock is the wall clock
+        assert 0.7 < pace < 1.3, (first, second, pace)
+    await close(a)

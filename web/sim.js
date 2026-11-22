@@ -554,6 +554,23 @@ new ResizeObserver(fit).observe($("stage"));   // the stage changes when the sid
 fit();
 connect();
 
+// How fast the Kode Dot runs: its emulated clock (api/stats) read every 2 s
+// against this page's. 1.00 is a board's own pace; below it, the emulator
+// cannot keep up on this computer.
+let paceAt = null;   // the last reading: [the page's clock, the chip's], in ms
+async function pace() {
+  setTimeout(pace, 2000);
+  if (!ws || ws.readyState !== WebSocket.OPEN) { paceAt = null; return; }
+  try {
+    const now = performance.now(), j = await (await fetch("api/stats")).json();
+    // A clock that went back is a reset; one that stands still is a Kode Dot that is off.
+    if (paceAt && j.sim_ms > paceAt[1]) $("speed").textContent = `${((j.sim_ms - paceAt[1]) / (now - paceAt[0])).toFixed(2)}× real time`;
+    else if (paceAt) $("speed").textContent = "…";
+    paceAt = [now, j.sim_ms];
+  } catch (_) { paceAt = null; }
+}
+setTimeout(pace, 2000);
+
 // "Settings": the controls and the console, over the Kode Dot, which is all
 // the window shows otherwise.
 $("settings").onclick = () => { document.documentElement.classList.toggle("panel"); };
