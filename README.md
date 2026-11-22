@@ -33,10 +33,10 @@ kode-sim run kode-app-template
 <p align="center">
   <img src=".github/img/window.jpg" alt="The window: the Kode Dot alone" width="300">
   &nbsp;&nbsp;
-  <img src=".github/img/settings.jpg" alt="Ajustes open: power, battery, microSD, motion, USB and the console" width="300">
+  <img src=".github/img/settings.jpg" alt="Settings open: power, battery, microSD, motion, USB and the console" width="300">
 </p>
 
-The window shows only the Kode Dot. Click the screen to touch it, click the buttons or use the keys: <kbd>T</kbd> for the top button, <kbd>B</kbd> for the bottom one, the arrows for the D-pad. **Ajustes** opens the rest: the battery, the USB cable, the microSD, motion, a computer on the USB port, installing an app and the console.
+The window shows only the Kode Dot. Click the screen to touch it, click the buttons or use the keys: <kbd>T</kbd> for the top button, <kbd>B</kbd> for the bottom one, the arrows for the D-pad. **Settings** opens the rest: the battery, the USB cable, the microSD, motion, a computer on the USB port, installing an app and the console.
 
 ## One simulator for everyone
 

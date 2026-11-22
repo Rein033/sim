@@ -422,14 +422,14 @@ test("the cable's snapshot fills the computer's panel, and its buttons send comm
   assert.equal(p.els.usbkbd.hidden, false);
   assert.equal(p.els.usbdisk.hidden, true);
   assert.equal(p.els.usbtyped.textContent, "Hola");
-  assert.equal(p.els.usbplug.textContent, "Sacar cable");
+  assert.equal(p.els.usbplug.textContent, "Unplug cable");
   say({ ...base, stage: "mounted", device: { vid: "306a", pid: "1234", manufacturer: "", product: "Disk", class: "mass storage" },
         disk: { label: "KODE", free: 2 << 20, total: 4 << 20, write_protected: false, files: [{ name: "a.txt", size: 19, dir: false }] } });
   assert.equal(p.els.usbdisk.hidden, false);
   assert.equal(p.els.usbkbd.hidden, true);
   assert.equal(p.els.usbeject.hidden, false);
   assert.equal(p.els.usbfiles.children.length, 1);
-  assert.match(p.els.usbvol.textContent, /KODE · 2\.0 MB libres de 4\.0 MB/);
+  assert.match(p.els.usbvol.textContent, /KODE · 2\.0 MB free of 4\.0 MB/);
   p.els.usbfiles.children[0].onclick();
   p.els.usbeject.onclick();
   const sent = ws.sent.filter((d) => typeof d === "string").map((d) => JSON.parse(d).usb).filter(Boolean);

@@ -88,7 +88,7 @@ body:
     id: logs
     attributes:
       label: Console and terminal output
-      description: What the terminal that runs kode-sim printed around the failure, and the page's console ("Ajustes" > Consola). For a crash, from the first error line to the end.
+      description: What the terminal that runs kode-sim printed around the failure, and the page's console ("Settings" > Console). For a crash, from the first error line to the end.
       render: text
 
   - type: textarea

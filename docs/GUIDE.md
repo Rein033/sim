@@ -25,7 +25,7 @@ real chips do for the kode-sdk drivers - the KTD2026 LED, the TCA6408A with
 five buttons and the touch IRQ, the CST820 touch, the AW86233 haptic, the
 BQ25896 charger and the CW2217 gauge sharing one battery, and the ES8311
 codec, and the QMI8658A IMU and the QMC5883P magnetometer, which measure
-what the page's "Movimiento" card poses. The codec's sound is esp-emu's I2S
+what the page's "Motion" card poses. The codec's sound is esp-emu's I2S
 too: kode-sim is the codec's end of the data pads, so what the firmware plays
 reaches the Mac's speaker and the Mac's microphone reaches the firmware's
 recordings, under the stock I2S driver. Chips that are not simulated (the NFC
@@ -121,10 +121,10 @@ browser, where the first click on the device starts the sound.
 
 The window shows only the Kode Dot. Click the glass to touch it (drag
 works), click the buttons or use the keys - <kbd>T</kbd> top,
-<kbd>B</kbd> bottom, the arrows for the D-pad. **Ajustes** slides out the
+<kbd>B</kbd> bottom, the arrows for the D-pad. **Settings** slides out the
 rest: power and reset, the battery and the USB cable, the microSD, motion,
 the computer on the USB cable, installing an app and the console.
-"Micrófono del Mac" sends the Mac's microphone to the Kode Dot's; it is on
+"Computer's microphone" sends your computer's microphone to the Kode Dot's; it is on
 unless you turn it off, and the page remembers that. Off, the Kode Dot hears
 only its own speaker through the case and its ADC's floor, as on a quiet
 desk. The console takes the device's commands (`help`, `info`, `bat_info`,
@@ -132,8 +132,8 @@ desk. The console takes the device's commands (`help`, `info`, `bat_info`,
 
 `http://127.0.0.1:PORT/?embed=1` is the same page made to live inside
 another page's `<iframe>`: the device takes the room the frame gives it and
-the side panel shrinks to a row (Más / Reset / Encender; the battery, the
-card, the console and the rest are behind Más). While someone presses,
+the side panel shrinks to a row (More / Reset / Power on; the battery, the
+card, the console and the rest are behind More). While someone presses,
 touches or types in it, it posts `{kodeSim: "activity"}` to its parent, at
 most every 10 s, so that a page that started the simulator can stop it when
 nobody has used it for a while.
@@ -191,7 +191,7 @@ same image stops and says so (give it `--sd OTHER.img`).
 The card is esp-emu's: its SDMMC host has the image in slot 0, the Kode
 Dot's slot, and the firmware's own driver mounts it, 4-bit at 40 MHz, as
 on the board - khal_sdmmc, FATFS, kdrv_sd, AO_Storage. esp-emu takes no
-card in or out while it runs, so the page's **SD insertada** restarts the
+card in or out while it runs, so the page's **SD card in** restarts the
 Kode Dot with the slot as it now is, as one would with the card pulled under
 it.
 
@@ -221,7 +221,7 @@ through the console, whose chunks are raw bytes, does not go through: use
 the mailbox, `kode-sim install --mailbox`), its clock
 starts unset until the network sets it, and the USB port has no computer on
 its cable: esp-emu's USB-OTG controller is there, but only a CDC console
-answers on it, not the page's "Ordenador (USB)"
+answers on it, not the page's "Computer (USB)"
 ([esp-emulator#51](https://github.com/espressif/esp-emulator/issues/51)).
 
 ## Installing apps
@@ -348,7 +348,7 @@ before a final newline; `{2,1}` is accepted and finds nothing.
 
 ## Motion: the IMU and the magnetometer
 
-The page's "Movimiento (IMU y brújula)" card poses the board with three
+The page's "Motion (IMU and compass)" card poses the board with three
 sliders (pitch, roll, heading clockwise from north), a magnet at a distance
 from its back, and a shake of 1.2 s. The page works out what the chips would
 measure in the board's own axes (1 g on z flat and face up; the Earth's field
@@ -373,7 +373,7 @@ C and tested on the host) so the app's stack, descriptors and classes run
 unchanged, and the "bus" is the page: `crates/kode-sim/src/usbhost.rs` is
 the computer on the other end of the cable (USB_* frames in `kemu_proto.h`).
 
-On the page, **Ordenador (USB)** plugs the cable (which also powers the
+On the page, **Computer (USB)** plugs the cable (which also powers the
 board) and pulls it out, with or without ejecting first. The computer
 enumerates what answers: its descriptors, `SET_ADDRESS`,
 `SET_CONFIGURATION`. Then:
@@ -403,10 +403,10 @@ endpoints yet (so the Webcam's video is not shown), and tinyusb's own
 | Six buttons (GPIO35 + TCA6408A) | ✓ |
 | RGB LED (KTD2026) | ✓ |
 | Haptic (AW86233, RTP) | ✓ shake on the page |
-| Speaker / microphone (ES8311) | ✓ through the Mac, on esp-emu's I2S; the Mac's microphone with "Micrófono del Mac" |
+| Speaker / microphone (ES8311) | ✓ through the Mac, on esp-emu's I2S; your computer's microphone with "Computer's microphone" |
 | Charger + gauge, ship mode | ✓ slider and USB switch |
 | Storage (FAT on flash) | ✓ within one run |
-| microSD | ✓ esp-emu's SDMMC, a card image on the Mac kept across runs; "SD insertada" on the page restarts with the slot changed |
+| microSD | ✓ esp-emu's SDMMC, a card image on the Mac kept across runs; "SD card in" on the page restarts with the slot changed |
 | ESP32-C5: WiFi, scans and joins, the vault | ✓ Kode's C5 firmware in a second esp-emu, over ESP-Hosted; one open network, `kode-sim`, joined for you the first time; `--forward` for inbound ports |
 | ESP32-C5: BLE | ~ it comes up and advertises; nothing on the Mac connects to it yet |
 | The C5's infrared, its 32 kHz crystal | ✗ |
@@ -416,7 +416,7 @@ endpoints yet (so the Webcam's video is not shown), and tinyusb's own
 | NFC, 125 kHz RFID | ✗ absent |
 | Console (USB-Serial/JTAG) | ✓ the terminal, the page and a serial port for kcli.py |
 | Wall clock (the P4's RTC) | ✓ set from the Mac's at every boot |
-| USB-OTG (dock port) | ✓ a device on a cable to a simulated computer: an app's TinyUSB runs as is, the page's "Ordenador (USB)" mounts its disk or reads its keyboard (below) |
+| USB-OTG (dock port) | ✓ a device on a cable to a simulated computer: an app's TinyUSB runs as is, the page's "Computer (USB)" mounts its disk or reads its keyboard (below) |
 | Expansion header UARTs | ✗ UART1 is kemu's link to the Mac (below); the other HP UARTs are the apps' |
 
 Known limitation: kemu's link to the Mac takes UART1, the only UART besides
