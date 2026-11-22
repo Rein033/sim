@@ -4,7 +4,10 @@ What changes from one kode-sim release to the next. The versions follow
 [SemVer](https://semver.org): until 1.0 a minor release (0.2, 0.3…) may
 change how kode-sim is used, and says so here.
 
-## [Unreleased]
+## [0.3.1] - 2026-11-22
+
+The window is in English and says how fast the Kode Dot runs, and kode-sim
+moves to esp-emu 1.2.0, which ends 0.3.0's known issue.
 
 ### Added
 
@@ -40,6 +43,14 @@ change how kode-sim is used, and says so here.
   ("every bond's subscriptions must fit NimBLE's store"). The configuration
   is made again when that file changes, in the kode-sdk the build was
   pointed at or the project's own, or when the project pins another kode-sdk.
+
+### Known issue
+
+- **kodeOS stands still for a few seconds as it boots.** While the P4 talks
+  to the C5 (its bring-up, BLE, joining the WiFi), the P4's emulated clock
+  nearly stops with both esp-emu idle: about five seconds on an Apple
+  M-series Mac. `--no-wifi` has none of it. Reported to Espressif as
+  esp-emulator#70.
 
 ## [0.3.0] - 2026-11-16
 

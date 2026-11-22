@@ -62,7 +62,7 @@ What esp-emu does not have yet, `kemu` does from inside the firmware: a small co
 | USB port | 🟡 kemu, with a simulated computer: its disk and its keyboard (a build for the simulator only) | a USB host in esp-emu ([esp-emulator#51](https://github.com/espressif/esp-emulator/issues/51)) |
 | Infrared, the 32 kHz crystal, light sleep | ❌ | esp-emu ([esp-emulator#54](https://github.com/espressif/esp-emulator/issues/54)) |
 | NFC, 125 kHz RFID | ❌ absent, as on a board without them | |
-| Speed | 🟡 half to full real time on an Apple M-series Mac, slower on smaller computers: each emulator runs on one core | [esp-emulator#53](https://github.com/espressif/esp-emulator/issues/53) |
+| Speed | 🟡 half to full real time on an Apple M-series Mac, slower on smaller computers: each emulator runs on one core. kodeOS stands still for a few seconds as it boots, while the P4 talks to the C5. Settings shows the speed | [esp-emulator#53](https://github.com/espressif/esp-emulator/issues/53), [esp-emulator#70](https://github.com/espressif/esp-emulator/issues/70) |
 
 ✅ works · 🟡 works, through a stand-in or with limits · ❌ not yet
 
