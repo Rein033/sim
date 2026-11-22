@@ -12,13 +12,13 @@ pack boots in kode-sim with its screen, its microSD, and its C5's WiFi and
 BLE. What kemu still adds to a build for the simulator is the USB port's
 computer, the console over UART1 and the RTC's time.
 
-## Where each part stands (after esp-emu 1.1.0)
+## Where each part stands (on esp-emu 1.2.0)
 
 | Part of the Kode Dot | Today | Waits for |
 |---|---|---|
 | ESP32-P4, flash, PSRAM | esp-emu | - |
 | I2C chips, buttons, IRQs | esp-emu's virtual parts, answered by kode-sim | - |
-| MIPI-DSI panel (410×502) | esp-emu (1.1.0); kode-sim is the panel on DSI virtual channel 0 over `--cosim-tcp`: the rows that changed, and DCS for lit, asleep and brightness. A read of the panel is answered with zeros. After kodeOS adopts an app from the mailbox, esp-emu's DMA refuses the frame buffer ("not in memory") and the screen is lost | to report to Espressif |
+| MIPI-DSI panel (410×502) | esp-emu (1.1.0); kode-sim is the panel on DSI virtual channel 0 over `--cosim-tcp`: the rows that changed, and DCS for lit, asleep and brightness. A read of the panel is answered with zeros. Since 1.2.0 the screen survives a flash write, so an app adopted from the mailbox keeps it ([esp-emulator#64](https://github.com/espressif/esp-emulator/issues/64)) | - |
 | JPEG and PPA | esp-emu (1.1.0); no JPEG decode to YUV yet | - |
 | I2S (speaker, microphone) | esp-emu; kode-sim is the ES8311's audio end. Since 1.1.0 the word clock's edges reach only a consumer that watches GPIO 37 ([esp-emulator#52](https://github.com/espressif/esp-emulator/issues/52)), so kemu no longer keeps it off its pad | - |
 | microSD (SDMMC slot 0) | esp-emu (1.1.0, `--sd`); no card in or out while it runs, so the page's switch restarts the Kode Dot | removing a card at run time |

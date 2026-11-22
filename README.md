@@ -6,7 +6,7 @@
 
 **The Kode Dot simulator: kodeOS and your apps, without the board**
 
-[![esp-emu 1.1.0](https://img.shields.io/badge/esp--emu-1.1.0-E7352C?logo=espressif&logoColor=white)](https://github.com/espressif/esp-emulator)
+[![esp-emu 1.2.0](https://img.shields.io/badge/esp--emu-1.2.0-E7352C?logo=espressif&logoColor=white)](https://github.com/espressif/esp-emulator)
 [![ESP-IDF v6.1](https://img.shields.io/badge/ESP--IDF-v6.1-E7352C?logo=espressif&logoColor=white)](https://github.com/espressif/esp-idf)
 ![Language: Rust](https://img.shields.io/badge/language-Rust-555555?logo=rust&logoColor=white)
 [![Licence: GPL-3.0-or-later](https://img.shields.io/badge/licence-GPL--3.0--or--later-2ea44f)](LICENSE)
@@ -44,7 +44,7 @@ Several people in the [Discord](https://discord.gg/gZSNXRytFV) are writing their
 
 ## Status
 
-kode-sim runs on esp-emu 1.1.0, which models the Kode Dot's screen (MIPI-DSI), its microSD (SDMMC) and its ESP32-C5 (ESP-Hosted over SDIO). **A binary built for the board runs unchanged**: kodeOS's own release, `kode-sim build --board`'s, an app from apps.kode.diy. The C5 runs Kode's own C5 firmware, [kode_slave_c5](https://github.com/kodediy/kode_slave_c5), in a second esp-emu beside the P4.
+kode-sim runs on esp-emu 1.2.0, which models the Kode Dot's screen (MIPI-DSI), its microSD (SDMMC) and its ESP32-C5 (ESP-Hosted over SDIO). **A binary built for the board runs unchanged**: kodeOS's own release, `kode-sim build --board`'s, an app from apps.kode.diy. The C5 runs Kode's own C5 firmware, [kode_slave_c5](https://github.com/kodediy/kode_slave_c5), in a second esp-emu beside the P4.
 
 What esp-emu does not have yet, `kemu` does from inside the firmware: a small component that `kode-sim build` links into the app. Today it holds only the USB port's computer, the console and the clock. When kemu is empty, `kode-sim build` and `kode-sim build --board` will be the same build.
 
@@ -85,7 +85,7 @@ ln -sf "$PWD/target/release/kode-sim" ~/.local/bin/kode-sim
 ```
 
 - Keep the folder where it is: kode-sim uses its `web/` and `firmware/`.
-- On its first run, kode-sim installs esp-emu 1.1.0 with Espressif's installer, and builds the C5's firmware with your ESP-IDF, both in its own cache.
+- On its first run, kode-sim installs esp-emu 1.2.0 with Espressif's installer, and builds the C5's firmware with your ESP-IDF, both in its own cache.
 - On Linux, install `mtools` too: kode-sim uses it to make the microSD image.
 
 ## Use

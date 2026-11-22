@@ -76,8 +76,8 @@ configures nor solves its dependencies again.
    The binary uses the page (`web/`) and kemu (`firmware/`) of the checkout
    it was built from, so keep the checkout where it is
    (`$KODE_SIM_WEB` and `$KODE_SIM_FIRMWARE` point elsewhere).
-3. `esp-emu` **1.1.0** - installed by kode-sim on its first run, with
-   Espressif's installer, into `~/Library/Caches/kode-sim/esp-emu-1.1.0`
+3. `esp-emu` **1.2.0** - installed by kode-sim on its first run, with
+   Espressif's installer, into `~/Library/Caches/kode-sim/esp-emu-1.2.0`
    (`$KODE_SIM_TOOLS` moves that folder; an `esp-emu` on PATH is left alone;
    `KODE_SIM_ESP_EMU` names another binary to run instead). Beside it, on the
    first run too, the C5's firmware: kode_slave_c5, fetched from GitHub and
@@ -215,15 +215,10 @@ python -m esptool --chip esp32p4 merge-bin --pad-to-size 32MB -o kodeos.bin \
 kode-sim run --firmware kodeos.bin
 ```
 
-Known issue, in a build for the simulator too: once kodeOS has adopted an
-app from the mailbox, esp-emu 1.1.0's DMA refuses the screen's frame buffer
-("is not in memory", "frame underrun") and the screen is lost. Install
-through the console where you can.
-
 Without kemu in it, the console is the firmware's USB-Serial/JTAG through
 esp-emu (the terminal and the page reach it a line at a time, so an install
-through the console, whose chunks are raw bytes, does not go through, and
-the mailbox has the known issue above), its clock
+through the console, whose chunks are raw bytes, does not go through: use
+the mailbox, `kode-sim install --mailbox`), its clock
 starts unset until the network sets it, and the USB port has no computer on
 its cable: esp-emu's USB-OTG controller is there, but only a CDC console
 answers on it, not the page's "Ordenador (USB)"
@@ -416,7 +411,7 @@ endpoints yet (so the Webcam's video is not shown), and tinyusb's own
 | ESP32-C5: BLE | ~ it comes up and advertises; nothing on the Mac connects to it yet |
 | The C5's infrared, its 32 kHz crystal | ✗ |
 | JPEG and PPA | ~ esp-emu's (not decoding to YUV); not yet tried by kode-sim's tests |
-| Light sleep | ✗ not in esp-emu 1.1.0 |
+| Light sleep | ✗ not in esp-emu 1.2.0 |
 | IMU (QMI8658A), magnetometer (QMC5883P) | ✓ the page poses the board (pitch, roll, heading), shakes it and brings a magnet near; the chips answer in the scales the driver asked for (below) |
 | NFC, 125 kHz RFID | ✗ absent |
 | Console (USB-Serial/JTAG) | ✓ the terminal, the page and a serial port for kcli.py |
