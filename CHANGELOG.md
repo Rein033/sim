@@ -6,8 +6,20 @@ change how kode-sim is used, and says so here.
 
 ## [Unreleased]
 
+### Changed
+
+- **esp-emu 1.2.0** (was 1.1.0), installed by kode-sim on its first run as
+  before. The emulator suite passes on it unchanged.
+- **The simulator's network names its subnet,** `192.168.4.0/24`, the one
+  it has always had: esp-emu 1.2.0 says its default will move to
+  `10.0.2.0/24`.
+
 ### Fixed
 
+- **An app adopted from the mailbox keeps the screen.** esp-emu 1.2.0 no
+  longer fails the DSI frame buffer's DMA during a flash write
+  (esp-emulator#64), so `kode-sim install --mailbox` and the page's mailbox
+  upload work with the screen on. 0.3.0's known issue is gone.
 - **A kode-sdk that moved on no longer leaves an old configuration behind.**
   kode-sdk 0.1.5 keeps the board's Kconfig in kbsp's `sdkconfig.board`. A
   sdkconfig made before a project's kode-sdk changed was kept, with the old

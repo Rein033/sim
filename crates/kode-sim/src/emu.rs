@@ -32,7 +32,7 @@ use crate::proto;
 /// the ESP-Hosted slave. Kept in
 /// kode-sim's tools folder, so an esp-emu on PATH (another version,
 /// someone else's) is left be.
-pub const ESP_EMU_VERSION: &str = "1.1.0";
+pub const ESP_EMU_VERSION: &str = "1.2.0";
 const INSTALLER: &str = "https://raw.githubusercontent.com/espressif/esp-emulator/main/install.sh";
 /// The Kode Dot's PSRAM: 32 MB on the board, 16 MB if esp-emu is left to its default.
 const PSRAM: &str = "32M";
@@ -154,7 +154,9 @@ pub fn free_port() -> io::Result<u16> {
 /// the Kode Dot's (host, guest) - the only way in from the Mac. With
 /// `restrict` nothing goes out but DNS.
 pub fn net_arg(forwards: &[(u16, u16)], restrict: bool) -> String {
-    let mut parts = vec!["user".to_string()];
+    // The subnet is said out loud: esp-emu 1.2.0 warns that its default,
+    // this one, becomes 10.0.2.0/24, and the guide gives these addresses.
+    let mut parts = vec!["user".to_string(), "net=192.168.4.0/24".to_string()];
     if restrict {
         parts.push("restrict=yes".into());
     }
@@ -734,11 +736,12 @@ mod tests {
 
     #[test]
     fn the_net_forwards_the_mac_s_ports_into_the_kode_dot() {
-        assert_eq!(net_arg(&[], false), "user");
+        // The subnet is named: esp-emu 1.2.0 says its default will move.
+        assert_eq!(net_arg(&[], false), "user,net=192.168.4.0/24");
         assert_eq!(
             net_arg(&[(25565, 25565), (8080, 80)], false),
-            "user,hostfwd=tcp:127.0.0.1:25565-:25565,hostfwd=tcp:127.0.0.1:8080-:80"
+            "user,net=192.168.4.0/24,hostfwd=tcp:127.0.0.1:25565-:25565,hostfwd=tcp:127.0.0.1:8080-:80"
         );
-        assert_eq!(net_arg(&[(1, 2)], true), "user,restrict=yes,hostfwd=tcp:127.0.0.1:1-:2");
+        assert_eq!(net_arg(&[(1, 2)], true), "user,net=192.168.4.0/24,restrict=yes,hostfwd=tcp:127.0.0.1:1-:2");
     }
 }

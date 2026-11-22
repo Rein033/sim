@@ -674,7 +674,7 @@ async def test_esp_emu_runs_as_a_kode_dot(sim, fake_emu, tmp_path):
     assert c5[:2] == ["--chip", "esp32c5"]
     sock = args[args.index("--hosted") + 1].removeprefix("bridge:host:")
     assert c5[c5.index("--hosted") + 1] == f"bridge:slave:{sock}"
-    assert c5[c5.index("--net") + 1] == "user"
+    assert c5[c5.index("--net") + 1] == "user,net=192.168.4.0/24"
     assert c5[c5.index("--wifi-ssid") + 1] == "kode-sim"
 
 
@@ -686,7 +686,7 @@ async def test_forwarded_ports_reach_esp_emu_as_hostfwd(exe, fake_emu, tmp_path)
     try:
         c5 = _c5_args(fake_emu)
         assert c5[c5.index("--net") + 1] == \
-            "user,hostfwd=tcp:127.0.0.1:25565-:25565,hostfwd=tcp:127.0.0.1:8080-:80", c5
+            "user,net=192.168.4.0/24,hostfwd=tcp:127.0.0.1:25565-:25565,hostfwd=tcp:127.0.0.1:8080-:80", c5
         assert "127.0.0.1:8080 on this Mac reaches the Kode Dot's port 80" in sim.stderr()
     finally:
         sim.stop()
@@ -972,7 +972,7 @@ async def test_no_internet_lets_nothing_out_but_dns(exe, fake_emu, tmp_path):
     sim = await start(exe, tmp_path, "--no-internet", "--forward", "8080:80")
     try:
         c5 = _c5_args(fake_emu)
-        assert c5[c5.index("--net") + 1] == "user,restrict=yes,hostfwd=tcp:127.0.0.1:8080-:80", c5
+        assert c5[c5.index("--net") + 1] == "user,net=192.168.4.0/24,restrict=yes,hostfwd=tcp:127.0.0.1:8080-:80", c5
     finally:
         sim.stop()
 
