@@ -98,6 +98,7 @@ function page(opts = {}) {
     requestAnimationFrame: (f) => { frames.push(f); return frames.length; },
     navigator: { mediaDevices: { getUserMedia: () => new Promise((resolve, reject) => media.push({ resolve, reject })) } },
     WebSocket, AudioContext, AudioWorkletNode,
+    fetch: async (url, init) => (opts.fetch || (() => ({ ok: false, status: 404, json: async () => ({}) })))(url, init),
     localStorage: { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, String(v)) },
     ResizeObserver: class { observe() {} },
   };
@@ -463,4 +464,19 @@ test("turning the microphone off is remembered", () => {
   assert.equal(p.store.get("kode-sim.mic"), "off");
   p.els.micin.checked = true; p.els.micin.onchange();
   assert.equal(p.store.get("kode-sim.mic"), "on");
+});
+
+// ---- How fast it runs ----------------------------------------------------------
+
+test("the settings say how fast the Kode Dot runs, from two readings of its clock", async () => {
+  let simMs = 1000;
+  const p = page({ fetch: (url) => ({ ok: true, status: 200, json: async () => ({ sim_ms: simMs }) }) });
+  p.open().onopen();
+  p.tick(2000); await settle(); await settle();      // the first reading: nothing to compare with yet
+  simMs += 1000;                                      // 1 s of the chip in 2 s of the wall clock
+  p.tick(2000); await settle(); await settle();
+  assert.equal(p.els.speed.textContent, "0.50× real time");
+  simMs += 2000;
+  p.tick(2000); await settle(); await settle();
+  assert.equal(p.els.speed.textContent, "1.00× real time");
 });
