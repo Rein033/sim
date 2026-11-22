@@ -8,6 +8,12 @@ change how kode-sim is used, and says so here.
 
 ### Changed
 
+- **The window is in English.** Every label, tooltip, state and message of
+  the page was in Spanish. "Ajustes" is "Settings", "Micrófono del Mac" is
+  "Computer's microphone", "SD insertada" is "SD card in", "Movimiento" is
+  "Motion", "Ordenador (USB)" is "Computer (USB)"; the guide and the README
+  use the new names, and the README's pictures show them.
+
 - **esp-emu 1.2.0** (was 1.1.0), installed by kode-sim on its first run as
   before. The emulator suite passes on it unchanged.
 - **The simulator's network names its subnet,** `192.168.4.0/24`, the one

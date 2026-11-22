@@ -78,7 +78,7 @@ function connect() {
   };
   ws.onclose = () => {
     micStop();
-    if (state !== "busy") setState("off", "Sin conexión con kode-sim; reintentando…", true);
+    if (state !== "busy") setState("off", "No connection to kode-sim; trying again…", true);
     setTimeout(connect, retryMs);
     retryMs = 1000;
   };
@@ -112,8 +112,8 @@ function onJson(j) {
 // usbhost.rs enumerates, mounts and types; this only shows it and asks.
 
 const USB_STAGE = {
-  no_cable: "sin cable", waiting: "cable conectado: nada responde", enumerating: "enumerando…",
-  mounted: "montado", keyboard: "teclado", ejected: "expulsado: ya se puede sacar el cable", failed: "falló",
+  no_cable: "no cable", waiting: "cable plugged in: nothing answers", enumerating: "enumerating…",
+  mounted: "mounted", keyboard: "keyboard", ejected: "ejected: the cable can come out now", failed: "failed",
 };
 let usbCable = false;
 
@@ -126,19 +126,19 @@ function usbPanel(u) {
   const st = $("usbst");
   st.className = `st ${u.stage}`;
   st.textContent = USB_STAGE[u.stage] + (u.error ? `: ${u.error}` : "");
-  $("usbplug").textContent = u.cable ? "Sacar cable" : "Conectar cable";
+  $("usbplug").textContent = u.cable ? "Unplug cable" : "Plug in cable";
   $("usbeject").hidden = u.stage !== "mounted" || !u.disk;
   const dev = $("usbdev");
   dev.hidden = !u.device;
-  if (u.device) dev.textContent = `${u.device.product || "dispositivo"} · ${u.device.class} · ${u.device.vid}:${u.device.pid}`;
+  if (u.device) dev.textContent = `${u.device.product || "device"} · ${u.device.class} · ${u.device.vid}:${u.device.pid}`;
   const disk = $("usbdisk");
   disk.hidden = !(u.disk && u.stage === "mounted");
   if (!disk.hidden) {
-    $("usbvol").textContent = `${u.disk.label || "sin nombre"} · ${usbBytes(u.disk.free)} libres de ${usbBytes(u.disk.total)}${u.disk.write_protected ? " · protegido contra escritura" : ""}`;
+    $("usbvol").textContent = `${u.disk.label || "no name"} · ${usbBytes(u.disk.free)} free of ${usbBytes(u.disk.total)}${u.disk.write_protected ? " · write-protected" : ""}`;
     const ul = $("usbfiles");
     ul.replaceChildren(...u.disk.files.map((f) => {
       const li = document.createElement("li");
-      li.title = f.dir ? "" : "Leer el archivo y comprobar su CRC";
+      li.title = f.dir ? "" : "Read the file and check its CRC";
       const name = document.createElement("span"), sz = document.createElement("span");
       name.textContent = (f.dir ? "▸ " : "") + f.name; sz.className = "sz"; sz.textContent = f.dir ? "" : usbBytes(f.size);
       li.append(name, sz);
@@ -169,7 +169,7 @@ $("usbput").onchange = async () => {
   const f = $("usbput").files[0];
   $("usbput").value = "";
   if (!f) return;
-  if (f.size > 700 * 1024) { $("usblast").textContent = "ese archivo pasa de 700 KB: usa «Copiar 1 MB» para medir la velocidad"; return; }
+  if (f.size > 700 * 1024) { $("usblast").textContent = 'that file is over 700 KB: use "Copy 1 MB" to measure the speed'; return; }
   const bytes = new Uint8Array(await f.arrayBuffer());
   let s = "";
   for (let i = 0; i < bytes.length; i += 8192) s += String.fromCharCode(...bytes.subarray(i, i + 8192));
@@ -224,8 +224,8 @@ function setState(s, detail = "", local = false) {
   state = s;
   const el = $("state");
   el.className = s;
-  el.textContent = { running: "encendido", off: "apagado", crashed: "colgado", busy: "en espera" }[s] || s;
-  $("power").textContent = s === "running" ? "Encendido" : "Encender";
+  el.textContent = { running: "on", off: "off", crashed: "crashed", busy: "waiting" }[s] || s;
+  $("power").textContent = s === "running" ? "On" : "Power on";
   $("power").disabled = s === "running";
   $("reset").disabled = s !== "running";
   const b = $("banner");
@@ -235,13 +235,13 @@ function setState(s, detail = "", local = false) {
   if (s === "off") { image.data.fill(0); ctx2d.putImageData(image, 0, 0); led([0, 0, 0]); }
   const p = document.createElement("div");
   p.textContent = local ? detail : s === "off"
-    ? "Apagado. Pulsa el botón inferior para encenderlo."
+    ? "Off. Press the bottom button to power it on."
     : s === "busy"
-    ? "Todos los simuladores están en uso. Esta página lo vuelve a intentar sola cada 15 s."
-    : "El firmware se ha colgado.";
+    ? "Every simulator is in use. This page tries again by itself every 15 s."
+    : "The firmware crashed.";
   b.append(p);
   if (s === "crashed" && detail) { const pre = document.createElement("pre"); pre.textContent = detail; b.append(pre); }
-  if (!local && s !== "busy") { const btn = document.createElement("button"); btn.textContent = s === "off" ? "Encender" : "Reiniciar"; btn.onclick = powerOn; b.append(btn); }
+  if (!local && s !== "busy") { const btn = document.createElement("button"); btn.textContent = s === "off" ? "Power on" : "Restart"; btn.onclick = powerOn; b.append(btn); }
   b.classList.add("show");
 }
 
@@ -253,15 +253,15 @@ $("app").onchange = async () => {
   const file = $("app").files[0];
   $("app").value = "";
   if (!file) return;
-  log(`[kode-sim] subiendo ${file.name} (${Math.round(file.size / 1024)} KB)…`);
+  log(`[kode-sim] uploading ${file.name} (${Math.round(file.size / 1024)} KB)…`);
   try {
     const r = await fetch("api/install", { method: "POST", body: file,
                                            headers: { "Content-Type": "application/octet-stream" } });
     const j = await r.json();
-    log(j.ok ? `[kode-sim] ${file.name} instalada; KodeOS la arranca`
-             : `[kode-sim] no se pudo instalar ${file.name}: ${j.error}`);
+    log(j.ok ? `[kode-sim] ${file.name} installed; kodeOS starts it`
+             : `[kode-sim] could not install ${file.name}: ${j.error}`);
   } catch (err) {
-    log(`[kode-sim] no se pudo subir ${file.name}: ${err}`);
+    log(`[kode-sim] could not upload ${file.name}: ${err}`);
   }
 };
 
@@ -431,8 +431,8 @@ function motionSend() {
   send(T.MOTION, out);
   const p = pose();
   $("mpitchv").textContent = `${p.pitch}°`; $("mrollv").textContent = `${p.roll}°`;
-  $("mheadv").textContent = `${p.heading}° ${["N", "NE", "E", "SE", "S", "SO", "O", "NO"][Math.round(p.heading / 45) % 8]}`;
-  $("mmagv").textContent = p.magnet >= MAGNET_FAR ? "sin imán" : `${p.magnet} mm`;
+  $("mheadv").textContent = `${p.heading}° ${["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(p.heading / 45) % 8]}`;
+  $("mmagv").textContent = p.magnet >= MAGNET_FAR ? "no magnet" : `${p.magnet} mm`;
   $("mread").textContent = `a ${m.slice(0, 3).map((v) => (v / 1000).toFixed(2)).join(" ")} g · m ${m.slice(6, 9).map((v) => (v / 10).toFixed(0)).join(" ")} µT`;
   if (shakeAt >= 0 && !motionTimer) motionTimer = setTimeout(() => { motionTimer = null; motionSend(); }, 33);
 }
@@ -491,7 +491,7 @@ async function audioUnlock() {
   })().catch((e) => { audioReady = null; ac = null; speaker = null; throw e; });   // the next gesture tries again
   await audioReady;
   if (ac.state !== "running") await ac.resume();
-  $("sound").textContent = "Sonido activo";
+  $("sound").textContent = "Sound on";
   $("sound").style.color = "var(--muted)";
 }
 
@@ -526,10 +526,10 @@ async function micStart(rate) {
     micNode = new AudioWorkletNode(ac, "kode-mic", { numberOfOutputs: 0, processorOptions: { rate: micRate } });
     micNode.port.onmessage = (m) => send(T.PCM_IN, new Uint8Array(m.data));
     src.connect(micNode);
-    log("[kode-sim] micrófono del Mac → micrófono del Kode Dot");
+    log("[kode-sim] the computer's microphone → the Kode Dot's microphone");
   } catch (err) {
     if (gen !== micGen) return;
-    log(`[kode-sim] sin micrófono (${err.name}); el Kode Dot oye solo su altavoz y su ruido de fondo`);
+    log(`[kode-sim] no microphone (${err.name}); the Kode Dot hears only its own speaker and its noise floor`);
     micStop();
     sendJson({ mic: false });
   }
@@ -554,12 +554,12 @@ new ResizeObserver(fit).observe($("stage"));   // the stage changes when the sid
 fit();
 connect();
 
-// "Ajustes": the controls and the console, over the Kode Dot, which is all
+// "Settings": the controls and the console, over the Kode Dot, which is all
 // the window shows otherwise.
 $("settings").onclick = () => { document.documentElement.classList.toggle("panel"); };
 
-// "Más" (only shown in ?embed=1): the rest of the controls and the console.
-$("more").onclick = () => { const on = document.documentElement.classList.toggle("more"); $("more").textContent = on ? "Menos" : "Más"; fit(); };
+// "More" (only shown in ?embed=1): the rest of the controls and the console.
+$("more").onclick = () => { const on = document.documentElement.classList.toggle("more"); $("more").textContent = on ? "Less" : "More"; fit(); };
 
 // ---- Inside another page (?embed=1) -----------------------------------------
 // The host page cannot see a click or a key that lands in the frame: tell it
