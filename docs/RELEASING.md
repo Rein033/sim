@@ -10,6 +10,8 @@
    them in the pinned esp-emu through `kode-sim`: the chips, the screen,
    sound, the card, the network, `install`, `install --mailbox` and
    `review`.
+   The same suite also runs on Linux: the `emu` workflow (`emu (linux)`),
+   weekly and from the Actions tab (Run workflow), or `gh workflow run emu`.
 3. **By hand, once:**
    - `kode-sim run` on KodeOS (kodediy/KodeOS), from a clean cache. Touch, the buttons,
      the LED, sound and the console on the page.

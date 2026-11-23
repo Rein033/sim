@@ -1,0 +1,65 @@
+# The emulator suite (pytest -m emu) on Linux: it builds kode-sdk's examples
+# and kodeOS with ESP-IDF v6.1 and boots them in esp-emu, which kode-sim
+# installs itself. Slow (~10 min on an M-series Mac), so not on pull
+# requests: weekly, and by hand from the Actions tab. The host suites are in
+# ci.yml.
+name: emu
+
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: emu-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IDF_PATH: ${{ github.workspace }}/.idf/esp-idf
+  IDF_TOOLS_PATH: ${{ github.workspace }}/.idf/tools
+
+jobs:
+  emu:
+    name: emu (linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: rsync and mtools (kode-sim build copies the project with one, formats the card with the other)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rsync mtools
+
+      # ESP-IDF v6.1 checked out and set up for the ESP32-P4 the Kode Dot
+      # has, found by kode-sim through IDF_PATH. The runner is Ubuntu and
+      # the suite needs a venv of its own, so this is not the espressif/idf
+      # container.
+      - name: ESP-IDF v6.1 (cached)
+        id: idf
+        uses: actions/cache@v4
+        with:
+          path: .idf
+          key: idf-v6.1-esp32p4-${{ runner.os }}
+      - name: ESP-IDF v6.1 (install)
+        if: steps.idf.outputs.cache-hit != 'true'
+        run: |
+          git clone -q --depth 1 --branch v6.1 --recursive --shallow-submodules \
+            https://github.com/espressif/esp-idf.git "$IDF_PATH"
+          "$IDF_PATH/install.sh" esp32p4
+
+      - name: Python tools for the tests
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -q -r tests/requirements.txt
+
+      - name: emulator suite
+        run: .venv/bin/pytest -m emu tests

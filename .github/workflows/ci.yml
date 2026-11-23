@@ -1,8 +1,8 @@
 # The host suites on every push and pull request: the Rust crates (fmt,
 # clippy, tests), the binary from outside against the fake esp-emu, the
 # page's sim.js in node, and kemu's C side. The emulator suite (pytest -m
-# emu: ESP-IDF v6.1 and esp-emu, ~10 min on an M-series Mac) is run by hand
-# before a release, as docs/RELEASING.md says.
+# emu: ESP-IDF v6.1 and esp-emu, ~10 min on an M-series Mac) is run on the Mac
+# by hand before a release, as docs/RELEASING.md says, and on Linux by emu.yml.
 name: ci
 
 on:
