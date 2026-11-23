@@ -72,6 +72,8 @@ What esp-emu does not have yet, `kemu` does from inside the firmware: a small co
 
 kode-sim is made for macOS on Apple silicon. It also builds and runs firmware on Linux: tried on Debian 12, x86_64 (see [Linux](docs/GUIDE.md#linux) in the guide).
 
+To install everything in one go (ESP-IDF, Rust, kode-sim and kodeOS) on macOS, Linux or Windows (WSL2), use the scripts in [`site/`](site/), which the download page offers.
+
 1. **ESP-IDF v6.1**, the version kodeOS is built with, installed in `~/.espressif` with Espressif's installer.
 2. **Rust**, stable, from [rustup.rs](https://rustup.rs).
 3. **Google Chrome or Microsoft Edge**, for the simulator's window. Without them, the Kode Dot opens in your usual browser.
