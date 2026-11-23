@@ -78,6 +78,8 @@ fi
 (cd "$KODE_HOME/kode-sim" && cargo build --release)
 ln -sf "$KODE_HOME/kode-sim/target/release/kode-sim" "$HOME/.local/bin/kode-sim"
 grep -q '.local/bin' "$HOME/.bashrc" 2>/dev/null || echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+# kode-sim finds ESP-IDF through IDF_PATH in every new terminal.
+grep -q 'IDF_PATH=' "$HOME/.bashrc" 2>/dev/null || echo "export IDF_PATH=\"$IDF\"" >> "$HOME/.bashrc"
 
 say "kodeOS"
 if [ -d "$KODE_HOME/KodeOS/.git" ]; then
