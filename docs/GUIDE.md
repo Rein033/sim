@@ -122,6 +122,7 @@ kode-sim run --firmware factory-flash.bin # a flash from elsewhere; --elf is opt
 kode-sim build <project>               # only build (--json: what it built, on stdout)
 kode-sim build --board <app>           # built as for the board: no kemu in it
 kode-sim install <app>                 # build an app and install it in the running kodeOS
+kode-sim install https://github.com/<owner>/<repo>[/tree/<branch or tag>]   # clone it into the cache first
 kode-sim install --port 8766 <app>     # into the simulator whose page is on 8766, when two run
 kode-sim install --mailbox <app>       # into app_pending, and a reset: as an Arduino upload
 kode-sim run --exit-on-crash <project> # exit non-zero if the firmware crashes (scripts, CI)
@@ -264,6 +265,13 @@ kodeOS reboots into it. With no simulator running it says so before building.
 kodeOS takes an install only while it is on screen itself: with an app
 running, go home first (hold the bottom button). `install` also takes an
 app image already built (a `.bin`) instead of a project.
+
+It also takes a GitHub link: `https://github.com/<owner>/<repo>`, with or
+without `.git`, and `.../tree/<branch or tag>` for one other than the default
+branch. kode-sim clones it, shallow and with its submodules, into
+`<cache>/github/<owner>/<repo>`, and builds and installs that folder. Run
+again, it fetches the same branch or tag again and takes its newest commit.
+A file or folder that is there by that name wins over the link.
 
 `--mailbox` needs no kodeOS console: the simulator reads the partition
 table at 0x8000 of the flash esp-emu is running, writes the app into

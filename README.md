@@ -98,6 +98,7 @@ kode-sim run --sdk ~/kode-sdk ~/kode-sdk/examples/display_lvgl   # a kode-sdk ex
 kode-sim run ~/KodeOS                                  # kodeOS
 kode-sim run --firmware kodeos.bin                     # a binary built for the board, as it is
 kode-sim install ~/my-app                              # build an app and install it in the running kodeOS
+kode-sim install https://github.com/kodediy/kode-app-template   # the same, straight from GitHub
 kode-sim build ~/my-app                                # only build it
 kode-sim review my-app.bin                             # boot it headless and check it, with a verdict
 ```
