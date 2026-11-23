@@ -13,6 +13,7 @@ mod build;
 mod c5;
 mod chips;
 mod emu;
+mod github;
 mod install;
 mod panel;
 mod proto;
@@ -56,7 +57,8 @@ enum Cmd {
     },
     /// Build an app and install it in the kodeOS that `kode-sim run` is running.
     Install {
-        /// An ESP-IDF project to build, or an app image already built (.bin)
+        /// An ESP-IDF project to build, an app image already built (.bin), or
+        /// a GitHub link (https://github.com/owner/repo, or .../tree/<branch or tag>)
         project: PathBuf,
         /// Build against this kode-sdk checkout instead of the pinned one
         #[arg(long, value_name = "DIR")]

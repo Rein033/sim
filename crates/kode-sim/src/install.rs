@@ -404,7 +404,7 @@ fn to_mailbox(image: &[u8], name: &str, sim: &Note) -> i32 {
 ///
 /// It finds the simulator before anything else, so nothing is built with
 /// nowhere to install it. PROJECT is a project to build or, a file, an app
-/// image already built.
+/// image already built; or a GitHub link, cloned into the cache and built.
 pub fn command(
     project: &std::path::Path,
     sdk: Option<&std::path::Path>,
@@ -419,6 +419,22 @@ pub fn command(
              then install into it from another terminal"
         );
         return 1;
+    };
+    // A GitHub link (and no file or folder of that name here): clone it
+    // into the cache first, then build that as any folder.
+    let fetched;
+    let project = match project.to_str().filter(|_| !project.exists()).and_then(crate::github::parse) {
+        Some(repo) => match crate::github::fetch(&repo) {
+            Ok(dir) => {
+                fetched = dir;
+                fetched.as_path()
+            }
+            Err(e) => {
+                eprintln!("kode-sim: could not fetch {}: {e}", project.display());
+                return 1;
+            }
+        },
+        None => project,
     };
     let app = if project.is_file() {
         project.to_path_buf()
