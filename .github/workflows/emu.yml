@@ -48,13 +48,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .idf
-          key: idf-v6.1-esp32p4-${{ runner.os }}
+          key: idf-v6.1-esp32p4-esp32c5-${{ runner.os }}
       - name: ESP-IDF v6.1 (install)
         if: steps.idf.outputs.cache-hit != 'true'
         run: |
           git clone -q --depth 1 --branch v6.1 --recursive --shallow-submodules \
             https://github.com/espressif/esp-idf.git "$IDF_PATH"
-          "$IDF_PATH/install.sh" esp32p4
+          "$IDF_PATH/install.sh" esp32p4,esp32c5
 
       - name: Python tools for the tests
         run: |
